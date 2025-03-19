@@ -38,10 +38,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
 
     // CATEGORÍAS {id}
-    Route::get('/categorias', [CategoriaController::class, 'index']);                                   //->name('categorias.index');
-    Route::post('/categorias', [CategoriaController::class, 'guardar']);                                //->name('categorias.store');
-    Route::put('/categorias', [CategoriaController::class, 'actualizar']);                              //->name('categorias.update');
-    Route::delete('/categorias', [CategoriaController::class, 'eliminar']);                             //->name('categorias.destroy');
+    Route::get('/getCategorias', [CategoriaController::class, 'getCategorias']);                                   //->name('categorias.index');
+    Route::post('/storeCategorias', [CategoriaController::class, 'storeCategorias']);                                //->name('categorias.store');
+    Route::post('/updateCategorias', [CategoriaController::class, 'updateCategorias']);                              //->name('categorias.update');
+    Route::post('/deleteCategorias', [CategoriaController::class, 'deleteCategorias']);                             //->name('categorias.destroy');
 
     
    
