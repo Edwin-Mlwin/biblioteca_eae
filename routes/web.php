@@ -1,13 +1,14 @@
 <?php
 
+use App\Http\Controllers\AutorController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DashboardController;  // Asegúrate de importar el DashboardController
+use App\Http\Controllers\DashboardController;  
+
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\TextoController;
 use App\Http\Controllers\ArchivoController;
-use App\Http\Controllers\AutorController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,22 +25,39 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     
     // CATEGORIAS
-    //Route::get('/getCategorias', [ProfileController::class, 'getCategorias']);
+    Route::get('/categorias', [ProfileController::class, 'getCategorias']);
+    Route::post('/categorias', [ProfileController::class, 'postCategorias']);
+    
+
+    // CATEGORÍAS {id}
+    Route::get('/categorias', [CategoriaController::class, 'index']);                                   //->name('categorias.index');
+    Route::post('/categorias', [CategoriaController::class, 'guardar']);                                //->name('categorias.store');
+    Route::put('/categorias', [CategoriaController::class, 'actualizar']);                              //->name('categorias.update');
+    Route::delete('/categorias', [CategoriaController::class, 'eliminar']);                             //->name('categorias.destroy');
 
     
-    Route::resource('usuarios', UsuarioController::class);    // Rutas de usuarios
-        
+   
+   // TEXTOS {id}
+   Route::get('/textos', [TextoController::class, 'index']);                                             //->name('textos.index');
+   Route::post('/textos', [TextoController::class, 'guardar']);                                          //->name('textos.store');
+   Route::put('/textos', [TextoController::class, 'actualizar']);                                        //->name('textos.update');
+   Route::delete('/textos', [TextoController::class, 'eliminar']);                                       //->name('textos.destroy');
+
+    //ARCHIVOS {id}
+    Route::get('/archivos', [ArchivoController::class, 'index']);                                      // ->name('archivos.index');
+    Route::post('/archivos', [ArchivoController::class, 'guardar']);                                   // ->name('archivos.store');
+    Route::put('/archivos', [ArchivoController::class, 'actualizar']);                                 // ->name('archivos.update');
+    Route::delete('/archivos', [ArchivoController::class, 'eliminar']);                                // ->name('archivos.destroy');
     
-    Route::resource('categorias', CategoriaController::class);  // Rutas de categorías
     
+    //AUTORES
+
+    Route::get('/autores',[AutorController::class,'index']);
+    Route::post('/autores', [AutorController::class,'guardar']);
+    Route::put('/autores', [AutorController::class,'actualizar']);
+    Route::delete('/autores', [AutorController::class,'eliminar']);
     
-    Route::resource('textos', TextoController::class);    // Rutas de textos
-    
-    
-    Route::resource('archivos', ArchivoController::class);     // Rutas de archivos
-    
-    
-    Route::resource('autores', AutorController::class);      // Rutas de autores
+  
 });
 
 require __DIR__.'/auth.php';

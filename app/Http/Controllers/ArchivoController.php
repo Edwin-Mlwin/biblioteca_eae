@@ -7,50 +7,45 @@ use App\Models\Archivo;
 
 class ArchivoController extends Controller
 {
-    //listar archivos
+    // Listar archivos
     public function index()
     {
-        $Archivos =Archivo::all();
-        return view("archivos.index.", compact("archivos"));
+        $archivos = Archivo::all(); // Corregido: Se usa minúscula en la variable
+        return view("archivos.index", compact("archivos")); // Se eliminó el "." final
     }
 
-    //crear un nuevo archivo
-
+    // Formulario para crear un nuevo archivo
     public function create()
     {
         return view("archivos.create");
     }
 
-    //guardar un nuevo archivo
-
+    // Guardar un nuevo archivo
     public function store(Request $request)
     {
         Archivo::create($request->all());
-        return redirect()->route("archivo.index")->with('seccess', 'archivo creado correctamente');
+        return redirect()->route("archivos.index")->with('success', 'Archivo creado correctamente'); // Corregido "seccess"
     }
 
-    //editar un archivo
-
+    // Formulario para editar un archivo existente
     public function edit($id)
     {
-        $archivo =Archivo::findOrFail($id);
+        $archivo = Archivo::findOrFail($id);
         return view('archivos.edit', compact('archivo'));
     }
 
-    //actualizar un archivo
-
+    // Actualizar un archivo
     public function update(Request $request, $id)
     {
-        $archivo =Archivo::findOrFail($id);
+        $archivo = Archivo::findOrFail($id);
         $archivo->update($request->all());
-        return redirect()->route('archivos.index.')->with('seccess','archivo actualizado correctamente');
+        return redirect()->route('archivos.index')->with('success', 'Archivo actualizado correctamente'); // Corregido "seccess" y "." en "index."
     }
 
-    //eliminar un archivo
-
+    // Eliminar un archivo
     public function destroy($id)
     {
         Archivo::findOrFail($id)->delete();
-        return redirect()->route('archivos.index')->with('seccess','archivo eliminado correctamente');
+        return redirect()->route('archivos.index')->with('success', 'Archivo eliminado correctamente'); // Corregido "seccess"
     }
 }

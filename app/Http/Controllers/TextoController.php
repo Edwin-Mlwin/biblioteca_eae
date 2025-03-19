@@ -11,8 +11,9 @@ class TextoController extends Controller
     //listar todo los texto
     public function index()
     {
-        $texto = Texto::all();
+        $textos = Texto::all(); // Cambié $texto a $textos
         return view("textos.index", compact("textos"));
+
     }
 
     //crear un nuevo texto
@@ -34,9 +35,10 @@ class TextoController extends Controller
 
     public function edit($id)
     {
-        $Texto = Texto::findOrFail($id);
-        return view("textos.edit", compact("texto"));
+    $texto = Texto::findOrFail($id); // Cambié $Texto a $texto
+    return view("textos.edit", compact("texto"));
     }
+
 
     //actualizar un texto
 
