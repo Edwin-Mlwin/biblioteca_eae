@@ -4,10 +4,12 @@ use App\Http\Controllers\AutorController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;  
 
+use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\TextoController;
 use App\Http\Controllers\ArchivoController;
+
 
 
 Route::get('/', function () {
@@ -23,6 +25,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+
+    //USUARIOS
+    Route::get('/usuarios', [UsuarioController::class, 'index']);
+    Route::post('/usuarios', [UsuarioController::class, 'guardar']);
+    Route::put('/usuarios', [UsuarioController::class, 'actualizar']);
+    Route::delete('/usuarios', [UsuarioController::class, 'eliminar']);
     
     // CATEGORIAS
     Route::get('/categorias', [ProfileController::class, 'getCategorias']);
