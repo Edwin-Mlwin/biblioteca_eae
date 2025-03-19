@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\User;  // Si estás utilizando el modelo de User
 
 

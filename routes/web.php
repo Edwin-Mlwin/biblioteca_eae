@@ -3,6 +3,11 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;  // Asegúrate de importar el DashboardController
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\TextoController;
+use App\Http\Controllers\ArchivoController;
+use App\Http\Controllers\AutorController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,8 +26,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // CATEGORIAS
     //Route::get('/getCategorias', [ProfileController::class, 'getCategorias']);
 
-
-
+    
+    Route::resource('usuarios', UsuarioController::class);    // Rutas de usuarios
+        
+    
+    Route::resource('categorias', CategoriaController::class);  // Rutas de categorías
+    
+    
+    Route::resource('textos', TextoController::class);    // Rutas de textos
+    
+    
+    Route::resource('archivos', ArchivoController::class);     // Rutas de archivos
+    
+    
+    Route::resource('autores', AutorController::class);      // Rutas de autores
 });
 
 require __DIR__.'/auth.php';
