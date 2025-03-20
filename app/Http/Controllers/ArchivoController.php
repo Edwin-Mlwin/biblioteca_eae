@@ -7,45 +7,71 @@ use App\Models\Archivo;
 
 class ArchivoController extends Controller
 {
-    // Listar archivos
-    public function index()
+    // Obtener archivos con estado = 1
+    public function getArchivos(Request $request)
     {
-        $archivos = Archivo::all(); // Corregido: Se usa minúscula en la variable
-        return view("archivos.index", compact("archivos")); // Se eliminó el "." final
+      
+        $archivos = Archivo::where('estado', 1)->get();
+        return response()->json($archivos);
     }
 
-    // Formulario para crear un nuevo archivo
-    public function create()
+    // Crear un nuevo archivo
+    public function storeArchivos(Request $request)
     {
-        return view("archivos.create");
+        $request->validate([
+            'directorio' => 'required|string|max:255',
+            'descripcion' => 'required|string|max:500',
+            'estado' => 'required|integer',
+            'is_visible' => 'required|in:SI,NO' // Validación para "SI" o "NO"
+        ]);
+
+        $archivo = Archivo::create([
+            'directorio' => $request->directorio,
+            'descripcion' => $request->descripcion,
+            'estado' => $request->estado,
+            'is_visible' => $request->is_visible // Almacenar "SI" o "NO"
+        ]);
+
+        return response()->json([
+            'message' => 'Archivo creado exitosamente',
+            'archivo' => $archivo
+        ], 200);
     }
 
-    // Guardar un nuevo archivo
-    public function store(Request $request)
+    // Actualizar un archivo existente
+    public function updateArchivos(Request $request)
     {
-        Archivo::create($request->all());
-        return redirect()->route("archivos.index")->with('success', 'Archivo creado correctamente'); // Corregido "seccess"
-    }
+        $request->validate([
+            'id' => 'required|exists:archivos,id',
+            'directorio' => 'required|string|max:255',
+            'descripcion' => 'required|string|max:500',
+            'estado' => 'required|integer',
+            'is_visible' => 'required|in:SI,NO' // Validación para "SI" o "NO"
+        ]);
 
-    // Formulario para editar un archivo existente
-    public function edit($id)
-    {
-        $archivo = Archivo::findOrFail($id);
-        return view('archivos.edit', compact('archivo'));
-    }
+        $archivo = Archivo::findOrFail($request->id);
+        $archivo->update([
+            'directorio' => $request->directorio,
+            'descripcion' => $request->descripcion,
+            'estado' => $request->estado,
+            'is_visible' => $request->is_visible // Almacenar "SI" o "NO"
+        ]);
 
-    // Actualizar un archivo
-    public function update(Request $request, $id)
-    {
-        $archivo = Archivo::findOrFail($id);
-        $archivo->update($request->all());
-        return redirect()->route('archivos.index')->with('success', 'Archivo actualizado correctamente'); // Corregido "seccess" y "." en "index."
+        return response()->json([
+            'message' => 'Archivo actualizado exitosamente',
+            'archivo' => $archivo
+        ]);
     }
 
     // Eliminar un archivo
-    public function destroy($id)
+    public function deleteArchivos(Request $request)
     {
-        Archivo::findOrFail($id)->delete();
-        return redirect()->route('archivos.index')->with('success', 'Archivo eliminado correctamente'); // Corregido "seccess"
+        $request->validate([
+            'id' => 'required|exists:archivos,id'
+        ]);
+
+        Archivo::findOrFail($request->id)->delete();
+
+        return response()->json(['message' => 'Archivo eliminado exitosamente']);
     }
 }

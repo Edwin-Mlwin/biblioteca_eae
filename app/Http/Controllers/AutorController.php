@@ -1,103 +1,79 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Autor;
+
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Models\Autor;
 
 class AutorController extends Controller
 {
-    // Listar todos los autores
-    public function index()
+    // Obtener todos los autores
+    public function getAutores(Request $request)
     {
-        $autores = Autor::all(); // Corregí el nombre de la variable a "autores"
-        return view('autores.index', compact('autores'));
+       
+        $autores = Autor::where('estado', 1)->get();
+        return response()->json($autores);
     }
 
-    // Mostrar el formulario para crear un nuevo autor
-    public function create()
+    // Crear un nuevo autor
+    public function storeAutores(Request $request)
     {
-        return view('autores.create');
-    }
-
-    // Guardar un nuevo autor
-    public function store(Request $request)
-    {
-        // Validar los datos del formulario
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'estado' => 'required|integer',
+        // Validación de los datos de entrada
+        $request->validate([
+            'nombre' => 'required|string|max:255|unique:autores',
+            'año' => 'required|integer',
+            'descripcion' => 'required|string|max:500',
         ]);
 
-        // por falso Si la validación falla, redirigir con errores
-        if ($validator->fails()) {
-            return redirect()->route('autores.create')
-                             ->withErrors($validator)
-                             ->withInput();
-        }
-
-        // Crear el autor
-        Autor::create($validator->validated());
-
-        return redirect()->route('autores.index')
-                         ->with('success', 'Autor creado correctamente'); // Corregí el mensaje de éxito
-    }
-
-    // Mostrar el formulario para editar un autor
-    public function edit($id)
-    {
-        try {
-            $autor = Autor::findOrFail($id);
-            return view('autores.edit', compact('autor'));
-        } catch (ModelNotFoundException $e) {
-            return redirect()->route('autores.index')
-                             ->with('error', 'Autor no encontrado');
-        }
-    }
-
-    // Actualizar un autor
-    public function update(Request $request, $id)
-    {
-        // Validar los datos del formulario
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:255',
-            'biografia' => 'nullable|string',
+        // Crear un nuevo autor en la base de datos
+        $autor = Autor::create([
+            'nombre' => $request->nombre,
+            'año' => $request->año,
+            'descripcion' => $request->descripcion,
         ]);
 
-        // Si la validación falla, redirigir con errores
-        if ($validator->fails()) {
-            return redirect()->route('autores.edit', $id)
-                             ->withErrors($validator)
-                             ->withInput();
-        }
+        return response()->json([
+            'message' => 'Autor creado exitosamente',
+            'autor' => $autor
+        ], 200);
+    }
 
-        try {
-            // Actualizar el autor
-            $autor = Autor::findOrFail($id);
-            $autor->update($validator->validated());
+    // Actualizar un autor existente
+    public function updateAutores(Request $request)
+    {
+        // Validación de los datos de entrada
+        $request->validate([
+            'id' => 'required|exists:autores,id',
+            'nombre' => 'required|string|max:255|unique:autores,nombre,' . $request->id,
+            'año' => 'required|integer',
+            'descripcion' => 'required|string|max:500',
+        ]);
 
-            return redirect()->route('autores.index')
-                             ->with('success', 'Autor actualizado correctamente');
-        } catch (ModelNotFoundException $e) {
-            return redirect()->route('autores.index')
-                             ->with('error', 'Autor no encontrado');
-        }
+        // Encontrar el autor por su ID y actualizarlo
+        $autor = Autor::findOrFail($request->id);
+        $autor->update([
+            'nombre' => $request->nombre,
+            'año' => $request->año,
+            'descripcion' => $request->descripcion,
+        ]);
+
+        return response()->json([
+            'message' => 'Autor actualizado exitosamente',
+            'autor' => $autor
+        ]);
     }
 
     // Eliminar un autor
-    public function destroy($id)
+    public function deleteAutores(Request $request)
     {
-        try {
-            $autor = Autor::findOrFail($id);
-            $autor->delete();
+        // Validación de los datos de entrada
+        $request->validate([
+            'id' => 'required|exists:autores,id'
+        ]);
 
-            return redirect()->route('autores.index')
-                             ->with('success', 'Autor eliminado correctamente');
-        } catch (ModelNotFoundException $e) {
-            return redirect()->route('autores.index')
-                             ->with('error', 'Autor no encontrado');
-        }
+        // Eliminar el autor
+        Autor::findOrFail($request->id)->delete();
+
+        return response()->json(['message' => 'Autor eliminado exitosamente']);
     }
 }

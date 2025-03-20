@@ -2,77 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categoria;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Models\Categoria;
 
 class CategoriaController extends Controller
 {
-    // Listar todas las categorías
-    public function index()
+    // Obtener categorías con estado = 1
+    public function getCategorias(Request $request)
     {
-        $categorias = Categoria::all(); // Carga todas las categorías
-        return view('categoria.index', compact('categorias'));
+        $categorias = Categoria::where('estado', 1)->get();
+        return response()->json($categorias);
     }
 
-    // Mostrar formulario para crear una nueva categoría
-    public function create()
-    {
-        return view('categoria.create');
-    }
-
-    // Guardar una nueva categoría
-    public function store(Request $request)
+    // Crear una nueva categoría
+    public function storeCategorias(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            '',
-            ''
-            // Añade otras reglas de validación según los campos
+            'nombre' => 'required|string|max:255|unique:categorias',
+            'descripcion' => 'required|string|max:500',
+            'estado' => 'required|integer'
         ]);
 
-        Categoria::create($request->all());
-        return redirect()->route('categorias.index')->with('success', 'Categoría creada correctamente');
+        $categoria = Categoria::create([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'estado' => $request->estado
+        ]);
+
+        return response()->json([
+            'message' => 'Categoría creada exitosamente',
+            'categoria' => $categoria
+        ], 200);
     }
 
-    // Mostrar formulario para editar una categoría
-    public function edit($id)
-    {
-        try {
-            $categoria = Categoria::findOrFail($id);
-        } catch (ModelNotFoundException $e) {
-            return redirect()->route('categorias.index')->with('error', 'Categoría no encontrada');
-        }
-
-        return view('categoria.edit', compact('categoria'));
-    }
-
-    // Actualizar una categoría
-    public function update(Request $request, $id)
+    // Actualizar una categoría existente
+    public function updateCategorias(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            // Añade otras reglas de validación según los campos
+            'id' => 'required|exists:categorias,id',
+            'nombre' => 'required|string|max:255|unique:categorias,nombre,' . $request->id,
+            'descripcion' => 'required|string|max:200',
+            'estado' => 'required|integer'
         ]);
 
-        try {
-            $categoria = Categoria::findOrFail($id);
-            $categoria->update($request->all());
-            return redirect()->route('categorias.index')->with('success', 'Categoría actualizada correctamente');
-        } catch (ModelNotFoundException $e) {
-            return redirect()->route('categorias.index')->with('error', 'Categoría no encontrada');
-        }
+        $categoria = Categoria::findOrFail($request->id);
+        $categoria->update([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'estado' => $request->estado
+        ]);
+
+        return response()->json([
+            'message' => 'Categoría actualizada exitosamente',
+            'categoria' => $categoria
+        ]);
     }
 
     // Eliminar una categoría
-    public function destroy($id)
+    public function deleteCategorias(Request $request)
     {
-        try {
-            $categoria = Categoria::findOrFail($id);
-            $categoria->delete();
-            return redirect()->route('categorias.index')->with('success', 'Categoría eliminada correctamente');
-        } catch (ModelNotFoundException $e) {
-            return redirect()->route('categorias.index')->with('error', 'Categoría no encontrada');
-        }
+        $request->validate([
+            'id' => 'required|exists:categorias,id'
+        ]);
+
+        Categoria::findOrFail($request->id)->delete();
+
+        return response()->json(['message' => 'Categoría eliminada exitosamente']);
     }
 }
